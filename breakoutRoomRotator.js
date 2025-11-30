@@ -165,6 +165,7 @@ class Ajastin {
 
     static #alustettu = false;
     static #todoList = [];
+    static #taskId;
 
 
     /**
@@ -223,12 +224,15 @@ class Ajastin {
      */
     static repeat(task, interval, times=Number.POSITIVE_INFINITY) {
         task();
+        const taskId = Ajastin.#taskId++;
         Ajastin.#todoList.push({
+            id: taskId,
             task: task,
             elapsed: 0,
             interval: interval,
             times: --times
         });
+        return taskId;
     }
 
     
