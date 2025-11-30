@@ -28,6 +28,7 @@ Breakout huoneiden vaihtamisen automatisointi Zoom web clientissä
 -[ ] vastuu painikkeiden painamisesta???
 
 ### BreakoutRoomRotator:
+-[ ] kiertämisen pausetus/jatkaminen
 -[ ] nykyiseen huoneeseen liittymisen estäminen
 -[ ] huoneeseen liittymisen virheenkäsittely
 -[ ] tyhjän huoneen skippaaminen
