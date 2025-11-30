@@ -53,13 +53,15 @@
 /**
  * Luokka jonka oliot kiertelevät Breakout-huoneissa Zoom web clientissä.
  * TODO
+ *  -[ ] kiertämisen pausetus/jatkaminen
  *  -[ ] nykyiseen huoneeseen liittymisen estäminen
+ *  -[ ] huoneeseen liittymisen virheenkäsittely
  *  -[ ] tyhjän huoneen skippaaminen
  *  -[ ] huoneiden tietojen hakeminen
  *  -[ ] join confirm käsittelijän kutsu painikkeiden painamisen sijasa (onko edes mahdollista) 
  */
 class BreakoutRoomRotator {
-    // TODO unohda staattisuus
+
     current; // TODO korjaa etsimään nykyinen kunnolla
     next;
     first = 1;
@@ -68,6 +70,13 @@ class BreakoutRoomRotator {
     approach = "linear";
     rooms = [];
 
+
+    /**
+     * Aloitetaan kiertäminen alusta
+     * @param {Number} firstRoom ensimmäisen huoneen numero
+     * @param {Number} lastRoom viimeisen huoneen numero
+     * @param {Number} secondsInRoom huoneenvaihtoväli sekunteina
+     */
     start(firstRoom = this.first, lastRoom = this.last, secondsInRoom = this.interval) {
         this.setRoomRange(firstRoom, lastRoom);
         this.current = undefined;
@@ -84,14 +93,10 @@ class BreakoutRoomRotator {
         Ajastin.repeat(rotate, this.interval);
     }
 
-    //pause
 
     /**
      * Liittyy annettuun breakout-huoneeseen Zoomin web versiossa
-     * TODO:
-     *  -[ ] nykyiseen huoneeseen liittymisen estäminen
      * @param {Number} breakoutRoomNumber 
-     * @returns 
      */
     static join(breakoutRoomNumber) {
         const wcWindow = document.getElementById("webclient")?.contentWindow;
@@ -105,24 +110,41 @@ class BreakoutRoomRotator {
         Clicker.execute(selectorQueue, wcDocument.body);
     }
 
+
+    /**
+     * Asetetaan olion huoneet välin perusteella
+     * @param {Number} first ensimmäisen huoneen numero
+     * @param {Number} last viimeisen huoneen numero
+     */
     setRoomRange(first, last) {
         this.first = first;
         this.last = last;
         this.rooms = intRange(first, last);
     }
 
-    #rotate() {
-        
-        // Tarviiko?:
-        // current = current >= end ? 1 : current + 1;
-    }
 
+    /**
+     * Luodaan ja käynnistetään annetun välin huoneita järjestyksessä kiertävä olio.
+     * @param {Number} startRoom ensimmäisen huoneen numero
+     * @param {Number} endRoom viimeisen huoneen numero
+     * @param {Number} secondsInRoom huoneenvaihtoväli sekunteina
+     * @returns luotu kiertäjäolio
+     */
     static createAndStartLinear(startRoom, endRoom, secondsInRoom=60) {
         const rotator = new BreakoutRoomRotator();
         rotator.start(startRoom, endRoom, secondsInRoom);
         return rotator;
     }
 
+
+    /**
+     * Luodaan ja käynnistetään annetun välin huoneita satunnaisesti kiertävä olio.
+     * Kaikkissa huoneissa vieraillaan kerran ennen toisten vierailujen aloittamista.
+     * @param {Number} startRoom ensimmäisen huoneen numero
+     * @param {Number} endRoom viimeisen huonenn numero
+     * @param {Number} secondsInRoom huoneenvaihtoväli sekunteina
+     * @returns luotu kiertäjäolio
+     */
     static createAndStartRandom(startRoom, endRoom, secondsInRoom=60) {
         const rotator = new BreakoutRoomRotator();
         rotator.approach = "random";
@@ -132,6 +154,7 @@ class BreakoutRoomRotator {
 }
 
 
+
 /**
  * Sekunnin välein toimiva simppeli ajastin, joka suorittaa tehtävälistan tehtäviä.
  * TODO ajastin
@@ -139,8 +162,10 @@ class BreakoutRoomRotator {
  *  -[ ] tehtävän countdown loki päälle/pois
  */
 class Ajastin {
+
     static #alustettu = false;
     static #todoList = [];
+
 
     /**
      * Luodaan div-elementti ja sille CSS-animaatio ja animaation tapahtumankuuntelija ajankulun mittaamiseksi.
@@ -163,6 +188,7 @@ class Ajastin {
         ajastin.addEventListener("animationiteration", Ajastin.#tick);
         Ajastin.#alustettu = true;
     }
+
 
     /**
      * Sekunnin välein tutkitaan ja suoritetaan tarvittaessa tehtävälistan tehtävät.
@@ -187,6 +213,7 @@ class Ajastin {
         }
     }
     
+
     /**
      * Lisätään toistuva tehtävä tehtävälistalle.
      * Suoritetaan ensimmäinen toisto.
@@ -204,6 +231,7 @@ class Ajastin {
         });
     }
 
+    
     /**
      * Tyhjennetään tehtävälista
      */
@@ -261,14 +289,26 @@ class Clicker {
     }
 }
 
-// Utility functions
 
+/**
+ * Taulukko kokonaisluvuista välillä [first, last]
+ * @param {Number} first välin ensimmäinen luku
+ * @param {Number} last välin viimeinen luku
+ * @returns taulukko
+ */
 function intRange(first, last) {
         const len = last - first + 1; // last included
         return Array.from({ length: len }, (v, i) => first+i);
         
 }
 
+
+/**
+ * Poistetaan ja palautetaan taulukosta yksi alkio annetun tavan perusteella.
+ * @param {Array} array muokattava taulukko
+ * @param {String} approach "random" tai "linear"(oletus)
+ * @returns taulukosta poistettu alkio
+ */
 function pickOne(array, approach) {
     switch (approach) {
         case "random":
@@ -280,6 +320,13 @@ function pickOne(array, approach) {
     }
 }
 
+
+/**
+ * Satunnainen kokonaisluku väliltä [a, b-1].
+ * @param {Number} a inklusiivinen alaraja
+ * @param {Number} b eksklusiivinen yläraja
+ * @returns satunnaisluku
+ */
 function randomInt(a, b) {
     return a + Math.floor(Math.random() * (a-b));
 }
