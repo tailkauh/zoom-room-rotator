@@ -50,6 +50,8 @@
     -[ ] painikkeiden painaminen???
 */
 
+"use strict";
+
 /**
  * Luokka jonka oliot kiertelevät Breakout-huoneissa Zoom web clientissä.
  * TODO
