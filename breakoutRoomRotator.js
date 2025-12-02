@@ -168,6 +168,7 @@ class Ajastin {
     static #alustettu = false;
     static #todoList = [];
     static #taskId = 0;
+    static logging = true;
 
 
     /**
@@ -204,13 +205,19 @@ class Ajastin {
         let j = t.length-1;
         for (let i = j; i >= 0; i--) {
             const todo = t[i];
+            const logging = Ajastin.logging && todo.logging;
             if (todo.freezed) { // keskeytetylle ei tehdä mitään
+                logging && console.log(`task "${todo.id}" is paused at ${todo.elapsed} elapsed seconds.`);
                 continue;
             }
+
             todo.elapsed++;
             if (todo.elapsed % todo.interval == 0) { // onko aika suorittaa tehtävä
+                logging && console.log(`task "${todo.id}" was executed at ${todo.elapsed} elapsed seconds.`);
                 todo.task();
                 todo.times--;
+            } else {
+                logging && console.log(`task "${todo.id}" is at ${todo.elapsed} elapsed seconds.`);
             }
             if (todo.times < 1) { // onko suorituskerrat täyttyneet
                 t[i] = t[j--];
@@ -252,7 +259,8 @@ class Ajastin {
             elapsed: 0, // lasketaan sekunteja aktiivisena (ei-jäädytettynä)
             interval: interval, // kuinka monen sekunnin välein suoritetaan
             times: times - 1, // suorituskerrat, suoritettu ensimmäisen kerran heti äsken
-            freezed: false  // onko jäädytetty/keskeytetty
+            freezed: false,  // onko jäädytetty/keskeytetty
+            logging: true
         }
         
         return Ajastin.#register(todo);
