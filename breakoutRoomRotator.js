@@ -206,7 +206,7 @@ class Ajastin {
         for (let i = j; i >= 0; i--) {
             const todo = t[i];
             const logging = Ajastin.logging && todo.logging;
-            if (todo.freezed) { // keskeytetylle ei tehdä mitään
+            if (todo.freeze) { // keskeytetylle ei tehdä mitään
                 logging && console.log(`task "${todo.id}" is paused at ${todo.elapsed} elapsed seconds.`);
                 continue;
             }
@@ -259,7 +259,7 @@ class Ajastin {
             elapsed: 0, // lasketaan sekunteja aktiivisena (ei-jäädytettynä)
             interval: interval, // kuinka monen sekunnin välein suoritetaan
             times: times - 1, // suorituskerrat, suoritettu ensimmäisen kerran heti äsken
-            freezed: false,  // onko jäädytetty/keskeytetty
+            freeze: false,  // onko jäädytetty/keskeytetty
             logging: true
         }
         
@@ -295,7 +295,7 @@ class Ajastin {
      */
     static togglePause(taskId) {
         const todo = Ajastin.findTask(taskId);
-        todo.freezed = !todo.freezed; 
+        todo.freeze = !todo.freeze; 
     }
 }
 
