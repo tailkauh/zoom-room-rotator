@@ -167,7 +167,7 @@ class Ajastin {
 
     static #alustettu = false;
     static #todoList = [];
-    static #taskId;
+    static #taskId = 0;
 
 
     /**
@@ -204,12 +204,15 @@ class Ajastin {
         let j = t.length-1;
         for (let i = j; i >= 0; i--) {
             const todo = t[i];
+            if (todo.freezed) { // keskeytetylle ei tehdä mitään
+                continue;
+            }
             todo.elapsed++;
-            if (todo.elapsed % todo.interval == 0) {
+            if (todo.elapsed % todo.interval == 0) { // onko aika suorittaa tehtävä
                 todo.task();
                 todo.times--;
             }
-            if (todo.times < 1) {
+            if (todo.times < 1) { // onko suorituskerrat täyttyneet
                 t[i] = t[j--];
                 t.pop();
             }
@@ -225,7 +228,7 @@ class Ajastin {
      */
     static #register(todo) {
         const uusiId = Ajastin.#taskId++;
-        task.id = uusiId;
+        todo.id = uusiId;
         Ajastin.#todoList.push(todo);
         return uusiId;        
     }
@@ -234,7 +237,7 @@ class Ajastin {
     /**
      * Lisätään toistuva tehtävä.
      * Suoritetaan ensimmäinen toisto.
-     * @param {Function} task ajastettava tehtävä
+     * @param {Function} task ajastettava tehtävä/funcktio
      * @param {Number} interval kuinka tiuhaan tehtävä suoritetaan (sekuntej)
      * @param {Number} times kuinka monta kertaa tehtävää tehdään
      * @returns ajastettavan tehtävän 
@@ -244,11 +247,12 @@ class Ajastin {
 
         // objektiksi, jolla ajastamiseen liittyviä lisätietoja
         const todo = {
-            id: -1,
-            taks: task,
-            elapsed: 0,
-            interval: interval,
-            times: times - 1 // suoritettu ensimmäisen kerran heti äsken
+            id: -1, // tunniste
+            task: task, // suoritettava funktio
+            elapsed: 0, // lasketaan sekunteja aktiivisena (ei-jäädytettynä)
+            interval: interval, // kuinka monen sekunnin välein suoritetaan
+            times: times - 1, // suorituskerrat, suoritettu ensimmäisen kerran heti äsken
+            freezed: false  // onko jäädytetty/keskeytetty
         }
         
         return Ajastin.#register(todo);
@@ -260,6 +264,30 @@ class Ajastin {
      */
     static clear() {
         Ajastin.#todoList = [];
+    }
+
+    static getList() {
+        return Ajastin.#todoList;
+    }
+
+
+    /**
+     * Palauttaa tehtävä-olion id:n perusteella
+     * @param {Number} taskId etsittävän tehtävän id 
+     * @returns löydetty olio tai undefined
+     */
+    static findTask(taskId) {
+        return Ajastin.#todoList.find(todo => todo.id == taskId);
+    }
+
+
+    /**
+     * Tehtävän keskeyttäminen/jatkaminen
+     * @param {Number} taskId tehtävän id
+     */
+    static togglePause(taskId) {
+        const todo = Ajastin.findTask(taskId);
+        todo.freezed = !todo.freezed; 
     }
 }
 
