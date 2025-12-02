@@ -215,26 +215,43 @@ class Ajastin {
             }
         }
     }
+
+
+    /**
+     * Lisää tehtävälle id:n.
+     * Lisätään tehtävä suoritettavien tehtävien joukkoon.
+     * @param {Object} todo
+     * @returns tehtävän id
+     */
+    static #register(todo) {
+        const uusiId = Ajastin.#taskId++;
+        task.id = uusiId;
+        Ajastin.#todoList.push(todo);
+        return uusiId;        
+    }
     
 
     /**
-     * Lisätään toistuva tehtävä tehtävälistalle.
+     * Lisätään toistuva tehtävä.
      * Suoritetaan ensimmäinen toisto.
-     * @param {*} task tehtävä
-     * @param {*} interval sekuntit kuinka usein tehtävä suoritetaan
-     * @param {*} times kuinka monta kertaa tehtävää tehdään
+     * @param {Function} task ajastettava tehtävä
+     * @param {Number} interval kuinka tiuhaan tehtävä suoritetaan (sekuntej)
+     * @param {Number} times kuinka monta kertaa tehtävää tehdään
+     * @returns ajastettavan tehtävän 
      */
     static repeat(task, interval, times=Number.POSITIVE_INFINITY) {
         task();
-        const taskId = Ajastin.#taskId++;
-        Ajastin.#todoList.push({
-            id: taskId,
-            task: task,
+
+        // objektiksi, jolla ajastamiseen liittyviä lisätietoja
+        const todo = {
+            id: -1,
+            taks: task,
             elapsed: 0,
             interval: interval,
-            times: --times
-        });
-        return taskId;
+            times: times - 1 // suoritettu ensimmäisen kerran heti äsken
+        }
+        
+        return Ajastin.#register(todo);
     }
 
     
