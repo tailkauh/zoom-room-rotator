@@ -20,3 +20,8 @@ Siirry huoneeseen 3:
 ```JavaScript
     BreakouRoomRotator.join(3);
 ```
+
+
+## TODO:
+
+[Toteutettavat ominaisuudet](https://github.com/tailkauh/zoom-room-rotator/issues/1)
