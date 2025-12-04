@@ -153,6 +153,31 @@ class BreakoutRoomRotator {
         rotator.start(startRoom, endRoom, secondsInRoom);
         return rotator;
     }
+
+    /**
+     * Lisätään painikkeet näkyviin Zoom web clientin painikepalkkiin
+     * TODO:
+     * - painikkeen toiminnallisuus
+     * - css säätäminen
+     */
+    static createUI() {
+        const wcWindow = document.getElementById("webclient")?.contentWindow;
+        const wcDocument = wcWindow.document;
+        const footBarDiv = wcDocument.querySelector("#foot-bar");
+
+        //div jossa painikkeet
+        const div = wcDocument.createElement("div");
+        div.id = "roomRotatorUi";
+        div.style.padding = "1em";
+        div.style.border = "white 1px solid";
+        const playPauseBtn = wcDocument.createElement("button");
+        playPauseBtn.innerText = "play"; 
+        playPauseBtn.style.color = "white";
+        playPauseBtn.style.padding = "0.25em";
+        playPauseBtn.style.border = "white 1px solid";
+        div.append(playPauseBtn);
+        footBarDiv.append(div);
+    }
 }
 
 
