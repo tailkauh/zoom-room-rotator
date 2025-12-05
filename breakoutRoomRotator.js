@@ -170,11 +170,71 @@ class BreakoutRoomRotator {
         div.id = "roomRotatorUi";
         div.style.padding = "1em";
         div.style.border = "white 1px solid";
+        div.style.display = "flex";
+
+        // start/pause painike
         const playPauseBtn = wcDocument.createElement("button");
-        playPauseBtn.innerText = "play"; 
+        const playText = "Kiertele huoneita";
+        const pauseText = "Keskeytä"
+        playPauseBtn.innerText = "Kiertele huoneita"; 
         playPauseBtn.style.color = "white";
         playPauseBtn.style.padding = "0.25em";
         playPauseBtn.style.border = "white 1px solid";
+
+        const iconDiv = wcDocument.createElement("div");
+        iconDiv.id = "iconDiv";
+        const iconSvg = `<svg height="3em" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="40" cy="40" r="12" fill="white"/>
+            <circle cx="80" cy="40" r="12" fill="white"/>
+            <circle cx="40" cy="80" r="12" fill="white"/>
+            <circle cx="80" cy="80" r="12" fill="red"/>
+        </svg>
+        `;
+        iconDiv.innerHTML = iconSvg;
+        const icon = iconDiv.children[0];
+    
+        const rotateStyle = wcDocument.createElement("style");
+        rotateStyle.textContent = 
+            `@keyframes quarterEase {
+                0% {
+                  transform: rotate(0deg);
+                  animation-timing-function: ease-in-out;
+                }
+                25% {
+                  transform: rotate(90deg);
+                  animation-timing-function: ease-in-out;
+                }
+                50% {
+                  transform: rotate(180deg);
+                  animation-timing-function: ease-in-out;
+                }
+                75% {
+                  transform: rotate(270deg);
+                  animation-timing-function: ease-in-out;
+                }
+                100% {
+                  transform: rotate(360deg);
+                }
+        }`;
+        wcDocument.head.appendChild(rotateStyle);
+
+        playPauseBtn.addEventListener("click", e => {
+            const text = playPauseBtn.innerText;
+            if (text === playText) {
+                playPauseBtn.innerText = pauseText;
+                playPauseBtn.style.border = "red 1px solid";
+                icon.style.animation = "quarterEase 4s infinite forwards";
+
+
+
+            } else {
+                playPauseBtn.innerText = playText;
+                playPauseBtn.style.border = "white 1px solid";
+                icon.style.animation = "";
+            }
+        });
+        
+        div.append(iconDiv);
         div.append(playPauseBtn);
         footBarDiv.append(div);
     }
