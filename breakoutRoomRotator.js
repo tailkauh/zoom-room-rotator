@@ -71,6 +71,7 @@ class BreakoutRoomRotator {
     interval = 50;
     approach = "linear";
     rooms = [];
+    rotatorTaskId;
 
 
     /**
@@ -92,7 +93,7 @@ class BreakoutRoomRotator {
 
         // kiertämisen aloitus
         Ajastin.alusta();
-        Ajastin.repeat(rotate, this.interval);
+        this.rotatorTaskId = Ajastin.repeat(rotate, this.interval);
     }
 
 
@@ -122,6 +123,14 @@ class BreakoutRoomRotator {
         this.first = first;
         this.last = last;
         this.rooms = intRange(first, last);
+    }
+
+
+    /**
+     * Keskeytetään tai jatketaan huoneiden kiertämistä
+     */
+    pauseOrContinue() {
+        Ajastin.togglePause(this.rotatorTaskId);
     }
 
 
@@ -181,6 +190,7 @@ class BreakoutRoomRotator {
         playPauseBtn.style.padding = "0.25em";
         playPauseBtn.style.border = "white 1px solid";
 
+        // pyörivä koristekuvake
         const iconDiv = wcDocument.createElement("div");
         iconDiv.id = "iconDiv";
         const iconSvg = `<svg height="3em" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
@@ -218,12 +228,21 @@ class BreakoutRoomRotator {
         }`;
         wcDocument.head.appendChild(rotateStyle);
 
+        let rotator;
+
+        // painikkeen toiminta
         playPauseBtn.addEventListener("click", e => {
             const text = playPauseBtn.innerText;
             if (text === playText) {
                 playPauseBtn.innerText = pauseText;
                 playPauseBtn.style.border = "red 1px solid";
                 icon.style.animation = "quarterEase 4s infinite forwards";
+                if (rotator === undefined) {
+                    // TODO toteuta käyttäen asetettuja asetuksia
+                    rotator = BreakoutRoomRotator.createAndStartLinear(1, 10, 20);
+                } else {
+                    rotator.pauseOrContinue();
+                }
 
 
 
@@ -231,6 +250,7 @@ class BreakoutRoomRotator {
                 playPauseBtn.innerText = playText;
                 playPauseBtn.style.border = "white 1px solid";
                 icon.style.animation = "";
+                rotator.pauseOrContinue();
             }
         });
         
